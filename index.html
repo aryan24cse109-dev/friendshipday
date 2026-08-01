@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Friendship Day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="floaties" id="floaties" aria-hidden="true"></div>
+
+<!-- progress dots -->
+<nav class="page-dots" id="page-dots" aria-label="Page progress">
+  <button class="dot active" data-goto="0" aria-label="Notification"></button>
+  <button class="dot" data-goto="1" aria-label="Note"></button>
+  <button class="dot" data-goto="2" aria-label="Certificate"></button>
+  <button class="dot" data-goto="3" aria-label="Characteristics"></button>
+  <button class="dot" data-goto="4" aria-label="Memories"></button>
+  <button class="dot" data-goto="5" aria-label="Final note"></button>
+</nav>
+
+<main id="pages">
+
+  <!-- PAGE 0 — LANDING / NOTIFICATION -->
+  <section class="page active" id="page-0" data-page="0">
+    <div class="landing">
+      <p class="notif-line">You have a notification&hellip;</p>
+      <button class="envelope-wrap" id="envelope-btn" aria-label="Open the envelope">
+        <span class="notif-badge">1</span>
+        <span class="envelope">
+          <span class="envelope-back"></span>
+          <span class="letter-peek"></span>
+          <span class="envelope-flap"></span>
+          <span class="envelope-seal">&#10084;</span>
+        </span>
+      </button>
+      <p class="tap-hint">tap the envelope to open it</p>
+    </div>
+  </section>
+
+  <!-- PAGE 1 — NOTE + PHOTO (staggered load) -->
+  <section class="page" id="page-1" data-page="1">
+    <div class="paper-card note-card">
+      <p class="eyebrow" id="note-eyebrow">a little something for you</p>
+      <h1 class="script-title reveal-item" id="note-title">Happy Friendship Day</h1>
+      <div class="photo-frame reveal-item" id="note-photo-frame">
+        <div class="photo-loader" id="note-photo-loader">
+          <span></span><span></span><span></span>
+        </div>
+        <img src="images/dictionary-photo.jpeg" alt="A favorite memory together" class="loading-img" id="note-photo">
+        <span class="tape tape-left"></span>
+        <span class="tape tape-right"></span>
+      </div>
+      <p class="note-text" id="note-text"></p>
+      <button class="next-btn reveal-item" data-next id="note-next-btn">Keep going &rarr;</button>
+    </div>
+  </section>
+
+  <!-- PAGE 2 — CERTIFICATE -->
+  <section class="page" id="page-2" data-page="2">
+    <div class="cert-stage">
+
+      <div class="award-intro" id="award-intro">
+        <p class="eyebrow">this year's</p>
+        <p class="award-kicker">Lifetime Bestie Award</p>
+        <p class="award-goes-to">goes to</p>
+        <h2 class="script-title award-name" id="award-name"><span id="award-name-text"></span><span class="cursor">|</span></h2>
+        <button class="open-cert-btn" id="open-cert-btn" hidden>Open the Certificate</button>
+      </div>
+
+      <div class="certificate" id="certificate" hidden>
+        <div class="certificate-inner">
+          <span class="cert-corner tl"></span>
+          <span class="cert-corner tr"></span>
+          <span class="cert-corner bl"></span>
+          <span class="cert-corner br"></span>
+          <p class="cert-eyebrow">Certificate of Friendship</p>
+          <p class="cert-medal">&#127942;</p>
+          <p class="cert-line">This certifies that</p>
+          <h3 class="cert-name" id="cert-name">My Person</h3>
+          <p class="cert-line">has officially earned the title of</p>
+          <p class="cert-title-line">Lifetime Bestie</p>
+          <p class="cert-body" id="cert-body">for endless laughs, unwavering loyalty, and always picking up the phone.</p>
+          <div class="cert-sign-row">
+            <div class="cert-sign">
+              <p class="sign-script">You know who</p>
+              <p class="sign-label">Signed</p>
+            </div>
+            <div class="cert-ribbon">&#127941;</div>
+            <div class="cert-sign">
+              <p class="sign-script" id="cert-date"></p>
+              <p class="sign-label">Date</p>
+            </div>
+          </div>
+        </div>
+        <button class="next-btn" data-next>Next &rarr;</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PAGE 3 — YOU ARE MY... (animated arrows) -->
+  <section class="page" id="page-3" data-page="3">
+    <div class="char-stage">
+      <h2 class="script-title char-title">You are my&hellip;</h2>
+      <div class="char-orbit" id="char-orbit">
+        <svg class="arrows-svg" id="arrows-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+        <div class="bestie-frame">
+          <img src="images/bestie-photo.jpeg" alt="My bestie" class="bestie-photo">
+          <span class="tape tape-left"></span>
+          <span class="tape tape-right"></span>
+        </div>
+        <div class="char-labels" id="char-labels"></div>
+      </div>
+      <button class="next-btn" data-next>Next &rarr;</button>
+    </div>
+  </section>
+
+  <!-- PAGE 4 — MEMORIES COLLAGE -->
+  <section class="page" id="page-4" data-page="4">
+    <div class="memories-stage">
+      <h2 class="script-title">Our Memories</h2>
+      <div class="memories-row">
+        <figure class="mem mem-big mem-1">
+          <img src="images/memories/memory-1.jpeg" alt="Memory one">
+          <span class="tape tape-left"></span>
+        </figure>
+        <div class="mem-stack">
+          <figure class="mem mem-small mem-2">
+            <img src="images/memories/memory-2.jpeg" alt="Memory two">
+          </figure>
+          <figure class="mem mem-small mem-3">
+            <img src="images/memories/memory-3.jpeg" alt="Memory three">
+          </figure>
+        </div>
+        <figure class="mem mem-big mem-4">
+          <img src="images/memories/memory-4.jpeg" alt="Memory four">
+          <span class="tape tape-right"></span>
+        </figure>
+      </div>
+      <button class="next-btn" data-next>Next &rarr;</button>
+    </div>
+  </section>
+
+  <!-- PAGE 5 — FINAL NOTE (full page) -->
+  <section class="page" id="page-5" data-page="5">
+    <div class="final-note">
+      <div class="final-hearts" aria-hidden="true"></div>
+      <p class="eyebrow">before you go</p>
+      <h2 class="script-title">One Last Thing&hellip;</h2>
+      <div class="final-note-body" id="final-note-body"></div>
+      <p class="final-signature">Forever your person, <br><span class="script-title">Me</span></p>
+      <button class="replay-btn" id="replay-btn">Read it again &#8635;</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="side-nav" id="side-nav">
+  <button class="side-btn" id="prev-btn" aria-label="Previous page">&#8593;</button>
+  <button class="side-btn" id="next-btn" aria-label="Next page">&#8595;</button>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
