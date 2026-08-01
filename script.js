@@ -2,7 +2,7 @@
    EDIT ME — all the personal content lives here
    ============================================================ */
 const CONFIG = {
-  friendName: "Apurva Dadhich",                 // shown on the certificate + award page
+  friendName: "My Friend",                 // shown on the certificate + award page
   noteText: "Here's to the person who's somehow both the reason I laugh the hardest and the reason I lose my patience the fastest. You're a certified overthinker, part-time menace, full-time chaos generator, and completely allergic to admitting you're wrong. Yet somehow, every dumb conversation, every random plan, and every ridiculous memory is better because you're in it. Thanks for being my favorite headache. Happy Friendship Day—you wonderfully unhinged human. 💜",
   certificateBody: "for endless laughs, unwavering loyalty, and always picking up the phone.",
   certificateDate: new Date().toLocaleDateString("en-GB", {
