@@ -1,96 +1,281 @@
-// ---------------------------------------------------------------
-// Friendship Day site — navigation, award animation, image fallback
-// ---------------------------------------------------------------
+/* ============================================================
+   EDIT ME — all the personal content lives here
+   ============================================================ */
+const CONFIG = {
+  friendName: "My Person",                 // shown on the certificate + award page
+  noteText: "Some people come into your life for a season, and some come in and just never leave the group chat. I'm so glad it's you. Here's to every inside joke, every 2am phone call, and every memory we haven't made yet.",
+  certificateBody: "for endless laughs, unwavering loyalty, and always picking up the phone.",
+  certificateDate: "Friendship Day, " + new Date().getFullYear(),
 
-const scenes = Array.from(document.querySelectorAll(".scene"));
-const dotsWrap = document.getElementById("dots");
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
+  // characteristics shown around the bestie photo on page 3
+  characteristics: [
+    "favorite person",
+    "partner in crime",
+    "therapist",
+    "hype squad",
+    "chaos coordinator",
+    "forever plus one"
+  ],
 
-let current = 0;
+  // captions for the memory photos (optional, shown as image alt/title)
+  memoryCaptions: [
+    "the day it all started",
+    "that one road trip",
+    "way too much cake",
+    "still going strong"
+  ],
 
-// Build pagination dots
-scenes.forEach((_, i) => {
-  const dot = document.createElement("button");
-  dot.className = "dot-indicator" + (i === 0 ? " active" : "");
-  dot.setAttribute("aria-label", `Go to page ${i + 1}`);
-  dot.addEventListener("click", () => goTo(i));
-  dotsWrap.appendChild(dot);
-});
-const dotEls = Array.from(dotsWrap.children);
-
-function render() {
-  scenes.forEach((s, i) => s.classList.toggle("active", i === current));
-  dotEls.forEach((d, i) => d.classList.toggle("active", i === current));
-  prevBtn.disabled = current === 0;
-  nextBtn.disabled = current === scenes.length - 1;
-
-  // Trigger the award loading-bar animation each time scene 2 becomes active
-  if (current === 1) playAwardAnimation();
-}
-
-function goTo(index) {
-  current = Math.max(0, Math.min(scenes.length - 1, index));
-  render();
-}
-
-prevBtn.addEventListener("click", () => goTo(current - 1));
-nextBtn.addEventListener("click", () => goTo(current + 1));
-
-window.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowRight") goTo(current + 1);
-  if (e.key === "ArrowLeft") goTo(current - 1);
-});
-
-// ---- Award page: animated loading bar --------------------------------
-const loadingFill = document.getElementById("loadingFill");
-const loadingLabel = document.getElementById("loadingLabel");
-const awardBubble = document.getElementById("awardBubble");
-let awardTimer = null;
-
-function playAwardAnimation() {
-  clearInterval(awardTimer);
-  loadingFill.style.width = "0%";
-  loadingLabel.textContent = "LOADING...";
-  awardBubble.classList.remove("show");
-
-  const start = Date.now();
-  const duration = 1400;
-
-  awardTimer = setInterval(() => {
-    const t = Math.min(1, (Date.now() - start) / duration);
-    loadingFill.style.width = `${Math.round(t * 100)}%`;
-    if (t >= 1) {
-      clearInterval(awardTimer);
-      loadingLabel.textContent = "AWARDED";
-      awardBubble.classList.add("show");
-    }
-  }, 30);
-}
-
-// ---- Image fallback: show a soft color placeholder if a photo is missing ---
-// This lets the site look good immediately, before you've added your own
-// photos into the /images folder (see README.md for exact filenames).
-const tintMap = {
-  pink: "#F2A6C4",
-  purple: "#8B5CF6",
-  sage: "#7C9473",
-  gold: "#F5C94B",
+  finalNote: [
+    "If you're reading this, it means you made it all the way here — just like you've made it through every version of me over the years.",
+    "Thank you for the laughter, the late-night talks, and for never once making me feel alone.",
+    "Happy Friendship Day. Here's to many, many more.",
+  ],
 };
 
-document.querySelectorAll("img").forEach((img) => {
-  img.addEventListener("error", () => {
-    const tint = tintMap[img.dataset.tint] || "#F2A6C4";
-    const label = img.dataset.placeholder || "";
-    img.style.setProperty("--tint-color", tint);
-    img.classList.add("img-missing");
-    img.style.display = "flex";
-    img.style.alignItems = "center";
-    img.style.justifyContent = "center";
-    img.style.textAlign = "center";
-    img.alt = label || img.alt;
-    img.title = "Add your photo here — see README.md";
-  });
+/* ============================================================
+   PAGE NAVIGATION
+   ============================================================ */
+const pages = Array.from(document.querySelectorAll(".page"));
+const dots = Array.from(document.querySelectorAll(".dot"));
+const prevBtn = document.getElementById("prev-btn");
+const nextBtn = document.getElementById("next-btn");
+let current = 0;
+const pageInitDone = new Set();
+
+function goTo(index){
+  if(index < 0 || index >= pages.length) return;
+  if(index === current) return;
+
+  pages[current].classList.add("leaving");
+  pages[current].classList.remove("active");
+  setTimeout(()=> pages[current].classList.remove("leaving"), 650);
+
+  current = index;
+  pages[current].classList.add("active");
+
+  dots.forEach((d,i)=> d.classList.toggle("active", i === current));
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === pages.length - 1;
+
+  if(!pageInitDone.has(current)){
+    pageInitDone.add(current);
+    runPageIntro(current);
+  }
+}
+
+dots.forEach((d,i)=> d.addEventListener("click", ()=> goTo(i)));
+prevBtn.addEventListener("click", ()=> goTo(current - 1));
+nextBtn.addEventListener("click", ()=> goTo(current + 1));
+document.querySelectorAll("[data-next]").forEach(btn=>{
+  btn.addEventListener("click", ()=> goTo(current + 1));
 });
 
-render();
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "ArrowDown" || e.key === "PageDown") goTo(current + 1);
+  if(e.key === "ArrowUp" || e.key === "PageUp") goTo(current - 1);
+});
+
+prevBtn.disabled = true;
+
+/* ============================================================
+   PAGE 0 — ENVELOPE
+   ============================================================ */
+const envelopeBtn = document.getElementById("envelope-btn");
+envelopeBtn.addEventListener("click", ()=>{
+  if(envelopeBtn.classList.contains("opened")) return;
+  envelopeBtn.classList.add("opened");
+  setTimeout(()=> goTo(1), 900);
+});
+
+/* ============================================================
+   PAGE 1 — NOTE: staggered reveal (title -> photo -> text -> button)
+   NOT all at once — each piece loads in turn, like the reference video.
+   ============================================================ */
+function initNotePage(){
+  const title = document.getElementById("note-title");
+  const photoFrame = document.getElementById("note-photo-frame");
+  const photoLoader = document.getElementById("note-photo-loader");
+  const photoImg = document.getElementById("note-photo");
+  const textEl = document.getElementById("note-text");
+  const nextBtnEl = document.getElementById("note-next-btn");
+
+  // build the word-by-word text now, hidden, so it's ready to reveal
+  textEl.innerHTML = CONFIG.noteText.split(" ").map(w=>`<span class="word">${w}</span>`).join(" ");
+
+  setTimeout(()=> title.classList.add("shown"), 200);
+
+  setTimeout(()=>{
+    photoFrame.classList.add("shown");
+    // simulate a real "loading" moment before the photo appears
+    setTimeout(()=>{
+      photoLoader.classList.add("done");
+      photoImg.classList.add("shown");
+    }, 900);
+  }, 700);
+
+  // words reveal one by one after the photo has loaded in
+  const words = Array.from(textEl.querySelectorAll(".word"));
+  const wordStart = 2000;
+  words.forEach((w,i)=>{
+    setTimeout(()=> w.classList.add("shown"), wordStart + i * 55);
+  });
+
+  setTimeout(()=> nextBtnEl.classList.add("shown"), wordStart + words.length * 55 + 300);
+}
+
+/* ============================================================
+   PAGE 2 — CERTIFICATE
+   ============================================================ */
+function initCertificatePage(){
+  const nameText = document.getElementById("award-name-text");
+  const openBtn = document.getElementById("open-cert-btn");
+  const certificate = document.getElementById("certificate");
+  const awardIntro = document.getElementById("award-intro");
+
+  document.getElementById("cert-name").textContent = CONFIG.friendName;
+  document.getElementById("cert-body").textContent = CONFIG.certificateBody;
+  document.getElementById("cert-date").textContent = CONFIG.certificateDate;
+
+  // type the name in, letter by letter, like it's "loading"
+  const name = CONFIG.friendName;
+  let i = 0;
+  const typer = setInterval(()=>{
+    nameText.textContent = name.slice(0, i+1);
+    i++;
+    if(i >= name.length){
+      clearInterval(typer);
+      setTimeout(()=>{ openBtn.hidden = false; }, 400);
+    }
+  }, 90);
+
+  openBtn.addEventListener("click", ()=>{
+    awardIntro.style.transition = "opacity .4s ease, transform .4s ease";
+    awardIntro.style.opacity = "0";
+    awardIntro.style.transform = "translateY(-14px)";
+    setTimeout(()=>{
+      awardIntro.hidden = true;
+      certificate.hidden = false;
+      requestAnimationFrame(()=> certificate.classList.add("shown"));
+    }, 380);
+  });
+}
+
+/* ============================================================
+   PAGE 3 — CHARACTERISTICS with animated arrows
+   Positions are computed on a 100x100 viewBox circle so it stays
+   responsive at any screen size.
+   ============================================================ */
+function initCharacteristicsPage(){
+  const svg = document.getElementById("arrows-svg");
+  const labelsWrap = document.getElementById("char-labels");
+  const items = CONFIG.characteristics;
+  const cx = 50, cy = 50;
+  const radius = 42;
+
+  items.forEach((label, i)=>{
+    const angle = (-90 + (360 / items.length) * i) * (Math.PI / 180);
+    const x = cx + radius * Math.cos(angle);
+    const y = cy + radius * Math.sin(angle);
+
+    // control point bows the line slightly for a hand-drawn feel
+    const midX = cx + (radius * 0.55) * Math.cos(angle) + 6 * Math.sin(angle);
+    const midY = cy + (radius * 0.55) * Math.sin(angle) - 6 * Math.cos(angle);
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", `M ${cx} ${cy} Q ${midX} ${midY} ${x} ${y}`);
+    svg.appendChild(path);
+    const len = path.getTotalLength();
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = len;
+    path.style.transitionDelay = `${i * 0.28}s`;
+
+    const labelEl = document.createElement("div");
+    labelEl.className = "char-label";
+    labelEl.textContent = label;
+    labelEl.style.left = x + "%";
+    labelEl.style.top = y + "%";
+    labelEl.style.transitionDelay = `${i * 0.28 + 0.5}s`;
+    labelsWrap.appendChild(labelEl);
+  });
+
+  // trigger the draw-in animation shortly after the page mounts
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      svg.querySelectorAll("path").forEach(p=> { p.style.strokeDashoffset = 0; });
+      labelsWrap.querySelectorAll(".char-label").forEach(l=> l.classList.add("shown"));
+    }, 300);
+  });
+}
+
+/* ============================================================
+   PAGE 4 — MEMORIES COLLAGE
+   ============================================================ */
+function initMemoriesPage(){
+  const mems = document.querySelectorAll(".mem");
+  const captions = CONFIG.memoryCaptions;
+  mems.forEach((m,i)=>{
+    if(captions[i]) m.querySelector("img").title = captions[i];
+  });
+  requestAnimationFrame(()=>{
+    setTimeout(()=> mems.forEach(m=> m.classList.add("shown")), 150);
+  });
+}
+
+/* ============================================================
+   PAGE 5 — FINAL NOTE (full page, line by line)
+   ============================================================ */
+function initFinalPage(){
+  const body = document.getElementById("final-note-body");
+  body.innerHTML = CONFIG.finalNote.map(line=> `<span class="line">${line}</span>`).join("");
+  const lines = body.querySelectorAll(".line");
+  lines.forEach((l,i)=> setTimeout(()=> l.classList.add("shown"), 300 + i * 500));
+
+  // gentle falling hearts on the closing page
+  const heartsWrap = document.querySelector(".final-hearts");
+  for(let i=0;i<10;i++){
+    const h = document.createElement("span");
+    h.textContent = "❤";
+    h.style.cssText = `position:absolute; left:${Math.random()*100}%; top:-10%; color:#ffb4a8; font-size:${12+Math.random()*14}px; opacity:${.3+Math.random()*.4}; animation: heart-fall ${6+Math.random()*5}s linear ${Math.random()*4}s infinite;`;
+    heartsWrap.appendChild(h);
+  }
+
+  document.getElementById("replay-btn").addEventListener("click", ()=> goTo(0));
+}
+
+const heartFallStyle = document.createElement("style");
+heartFallStyle.textContent = `@keyframes heart-fall{0%{transform:translateY(0) rotate(0);}100%{transform:translateY(120vh) rotate(90deg);}}`;
+document.head.appendChild(heartFallStyle);
+
+/* ============================================================
+   dispatch per-page setup the first time it's shown
+   ============================================================ */
+function runPageIntro(index){
+  switch(index){
+    case 1: initNotePage(); break;
+    case 2: initCertificatePage(); break;
+    case 3: initCharacteristicsPage(); break;
+    case 4: initMemoriesPage(); break;
+    case 5: initFinalPage(); break;
+  }
+}
+
+/* ============================================================
+   ambient floating hearts on the landing page background
+   ============================================================ */
+(function ambientFloaties(){
+  const wrap = document.getElementById("floaties");
+  const emojis = ["💌","💕","✨","🎀"];
+  for(let i=0;i<12;i++){
+    const s = document.createElement("span");
+    s.textContent = emojis[i % emojis.length];
+    s.style.left = Math.random()*100 + "%";
+    s.style.animationDuration = (14 + Math.random()*10) + "s";
+    s.style.animationDelay = (Math.random()*14) + "s";
+    s.style.fontSize = (14 + Math.random()*14) + "px";
+    wrap.appendChild(s);
+  }
+})();
+
+/* run the very first page's intro if it ever isn't page 0 */
+prevBtn.disabled = true;
+nextBtn.disabled = pages.length <= 1;
